@@ -1,0 +1,152 @@
+AWSTemplateFormatVersion: 2010-09-09
+Metadata:
+  'AWS::CloudFormation::Designer':
+    1fc81219-dffd-4efe-a1c4-c288fb39a355:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 180
+        'y': 160
+      z: 0
+      embeds: []
+    d6a5f6f5-d2e9-4053-bbb5-f2be5af8518f:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 400
+        'y': 160
+      z: 0
+      embeds: []
+    d88c709f-db61-450c-bfe5-b868ca5c5397:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 530
+        'y': 160
+      z: 0
+      embeds: []
+    b0553dfe-0a02-4b88-aa44-ca0b5534aaec:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 730
+        'y': 30
+      z: 0
+      embeds: []
+    b36779b3-acf1-4864-8afd-1d4fcda8c9c8:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 730
+        'y': 220
+      z: 0
+      embeds: []
+    b47d95ba-a83b-4f7c-85d4-c2c7d8995c04:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 980
+        'y': 260
+      z: 0
+      embeds: []
+    8a599f68-1745-46b0-887e-2d02c2174249:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 400
+        'y': -40
+      z: 0
+      embeds: []
+    87c42fee-4fce-47d7-9dea-164ab96e65e9:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 860
+        'y': 250
+      z: 0
+      embeds: []
+Resources:
+  SQSPaymentRequests:
+    Type: 'AWS::SQS::Queue'
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 1fc81219-dffd-4efe-a1c4-c288fb39a355
+  LFProcessPayment:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Events: null
+      SqsEvent:
+        Type: SQS
+        Properties:
+          Queue: !GetAtt SQSPaymentRequests.Arn
+          BatchSize: 10
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: d6a5f6f5-d2e9-4053-bbb5-f2be5af8518f
+  SQSPaymentResponseToTwitch:
+    Type: 'AWS::SQS::Queue'
+    Properties: {}
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: b0553dfe-0a02-4b88-aa44-ca0b5534aaec
+  SQSPaymentResponseToDynamoDB:
+    Type: 'AWS::SQS::Queue'
+    Properties: {}
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: b36779b3-acf1-4864-8afd-1d4fcda8c9c8
+  DDBT2JO95:
+    Type: 'AWS::DynamoDB::Table'
+    Properties: {}
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: b47d95ba-a83b-4f7c-85d4-c2c7d8995c04
+  LFPaymentResponseToTwitch:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Events: null
+      SqsEvent:
+        Type: SQS
+        Properties:
+          Queue: !GetAtt SQSPaymentResponseToTwitch.Arn
+          BatchSize: 100
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 8a599f68-1745-46b0-887e-2d02c2174249
+  LFPaymentResponseToDynamoDB:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Events: null
+      SqsEvent:
+        Type: SQS
+        Properties:
+          Queue: !GetAtt SQSPaymentResponseToDynamoDB.Arn
+          BatchSize: 10
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: 87c42fee-4fce-47d7-9dea-164ab96e65e9
+  SNSPaymentProcessed:
+    Type: 'AWS::SNS::Topic'
+    Properties:
+      Subscription:
+        - Endpoint:
+            'Fn::GetAtt':
+              - SQSPaymentResponseToDynamoDB
+              - Arn
+          Protocol: sqs
+        - Endpoint:
+            'Fn::GetAtt':
+              - SQSPaymentResponseToTwitch
+              - Arn
+          Protocol: sqs
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: d88c709f-db61-450c-bfe5-b868ca5c5397
