@@ -1,0 +1,20 @@
+# Configuration of Gatling nodes.
+#
+# Run with: ansible-playbook gatling.yml -i gatling_inventory --key-file "~/.ssh/hackathon.pem"
+
+- hosts: gatling
+  remote_user: ec2-user
+  gather_facts: True
+  become: yes
+  roles:
+    - role: gatling
+      iterations: 100
+      concurrency: 10
+      ramp_up_time: 30
+      # the trailing / is important
+      base_url: "https://10.6.33.230:4000/"
+      headers:
+        - key: "Content-Type"
+          value: "text/plain"
+      test_limiter: iterations # other option is duration
+      max_duration: 60
