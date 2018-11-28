@@ -24,7 +24,7 @@ class gamechanger extends Simulation {
     .forever()
     {% endif %}
     {
-    exec(http("${url}").get("${url}"))
+    exec(http("${url}").post("${url}").body(RawFileBody("body.json")))
     }
 
   setUp(scn.inject(rampUsers(concurrency) during(rampUp)))

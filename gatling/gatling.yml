@@ -7,14 +7,16 @@
   gather_facts: True
   become: yes
   roles:
-    - role: gatling
-      iterations: 100
-      concurrency: 10
-      ramp_up_time: 30
+    - role: setup_gatling
+      iterations: 10
+      concurrency: 1
+      ramp_up_time: 1
       # the trailing / is important
-      base_url: "https://10.6.33.230:4000/"
+      base_url: "https://6nw1btf7rc.execute-api.us-east-1.amazonaws.com/dev/"
       headers:
         - key: "Content-Type"
-          value: "text/plain"
+          value: "application/json"
       test_limiter: iterations # other option is duration
       max_duration: 60
+    - run_gatling
+
