@@ -1,0 +1,74 @@
+{
+    "pipeline": {
+        "name": "GameChangerReinvent_EnhancedInfrastructure_Pipeline",
+        "roleArn": "arn:aws:iam::260345904678:role/service-role/AWSCodePipelineServiceRole-us-east-2-GameChangerReinvent_Enhanc",
+        "artifactStore": {
+            "type": "S3",
+            "location": "codepipeline-us-east-2-958777022793"
+        },
+        "stages": [
+            {
+                "name": "Source",
+                "actions": [
+                    {
+                        "name": "Source",
+                        "actionTypeId": {
+                            "category": "Source",
+                            "owner": "ThirdParty",
+                            "provider": "GitHub",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "Branch": "master",
+                            "OAuthToken": "****",
+                            "Owner": "sabram",
+                            "PollForSourceChanges": "false",
+                            "Repo": "reinvent46"
+                        },
+                        "outputArtifacts": [
+                            {
+                                "name": "SourceArtifact"
+                            }
+                        ],
+                        "inputArtifacts": []
+                    }
+                ]
+            },
+            {
+                "name": "Deploy",
+                "actions": [
+                    {
+                        "name": "Deploy",
+                        "actionTypeId": {
+                            "category": "Deploy",
+                            "owner": "AWS",
+                            "provider": "CloudFormation",
+                            "version": "1"
+                        },
+                        "runOrder": 1,
+                        "configuration": {
+                            "ActionMode": "CREATE_UPDATE",
+                            "Capabilities": "CAPABILITY_IAM",
+                            "RoleArn": "arn:aws:iam::260345904678:role/CloudFormationRole",
+                            "StackName": "GameChangerReinventEnhanceInfrastructureStack",
+                            "TemplatePath": "SourceArtifact::cf-dev-gamechanger-v2-env.yml"
+                        },
+                        "outputArtifacts": [],
+                        "inputArtifacts": [
+                            {
+                                "name": "SourceArtifact"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "version": 3
+    },
+    "metadata": {
+        "pipelineArn": "arn:aws:codepipeline:us-east-2:260345904678:GameChangerReinvent_EnhancedInfrastructure_Pipeline",
+        "created": 1543376038.9,
+        "updated": 1543376198.579
+    }
+}
