@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: 2010-09-09
+Metadata:
+  'AWS::CloudFormation::Designer':
+    b0553dfe-0a02-4b88-aa44-ca0b5534aaec:
+      size:
+        width: 60
+        height: 60
+      position:
+        x: 730
+        'y': 30
+      z: 0
+      embeds: []
+Resources:
+  SGGatling:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Gatling Security Group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          CidrIp: 208.78.232.7/32
+          FromPort: 22
+          ToPort: 22
+  GatlingServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.micro
+      ImageId: ami-0b59bfac6be064b78
+      KeyName: gatling-key
+      NetworkInterfaces: 
+        - AssociatePublicIpAddress: "true"
+          DeviceIndex: "0"
+          GroupSet: 
+            - Ref: "SGGatling"  
+Outputs: 
+ PublicIp: 
+  Value: 
+   "Fn::GetAtt": 
+    - GatlingServer
+    - PublicIp
+  Description: "Gatling Server's PublicIp Address"

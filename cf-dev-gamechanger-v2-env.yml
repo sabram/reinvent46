@@ -73,7 +73,7 @@ Metadata:
         'y': 250
       z: 0
       embeds: []
-Resources:
+Resources: 
   SQSPaymentRequests:
     Type: 'AWS::SQS::Queue'
     Metadata:
@@ -82,10 +82,10 @@ Resources:
   LFProcessPayment:
     Type: 'AWS::Lambda::Function'
     Properties:
-      Events: null
-      SqsEvent:
-        Type: SQS
-        Properties:
+      Events:
+        SqsEvent:
+         Type: SQS
+         Properties:
           Queue: !GetAtt SQSPaymentRequests.Arn
           BatchSize: 10
     Metadata:
@@ -112,8 +112,8 @@ Resources:
   LFPaymentResponseToTwitch:
     Type: 'AWS::Lambda::Function'
     Properties:
-      Events: null
-      SqsEvent:
+      Events:
+       SqsEvent:
         Type: SQS
         Properties:
           Queue: !GetAtt SQSPaymentResponseToTwitch.Arn
@@ -124,8 +124,8 @@ Resources:
   LFPaymentResponseToDynamoDB:
     Type: 'AWS::Lambda::Function'
     Properties:
-      Events: null
-      SqsEvent:
+      Events:
+       SqsEvent:
         Type: SQS
         Properties:
           Queue: !GetAtt SQSPaymentResponseToDynamoDB.Arn
