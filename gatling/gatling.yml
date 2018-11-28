@@ -4,7 +4,8 @@
 #
 # Run via CodeBuild with: ansible-playbook -i local gatling.yml
 
-- hosts: gatling
+- hosts: local
+  connection: local
   remote_user: ubuntu
   gather_facts: True
   become: yes
@@ -21,4 +22,3 @@
       test_limiter: iterations # other option is duration
       max_duration: 60
     - run_gatling
-
