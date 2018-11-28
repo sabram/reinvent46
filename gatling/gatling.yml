@@ -1,9 +1,11 @@
 # Configuration of Gatling nodes.
 #
-# Run with: ansible-playbook gatling.yml -i gatling_inventory --key-file "~/.ssh/hackathon.pem"
+# Run locally with: ansible-playbook gatling.yml -i gatling_inventory --key-file "~/.ssh/hackathon.pem"
+#
+# Run via CodeBuild with: ansible-playbook gatling.yml
 
 - hosts: gatling
-  remote_user: ec2-user
+  remote_user: ubuntu
   gather_facts: True
   become: yes
   roles:
