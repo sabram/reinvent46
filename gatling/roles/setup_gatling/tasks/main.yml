@@ -5,6 +5,7 @@
   apt:
     name: "{{ system_packages }}"
     state: latest
+    update_cache: yes
   vars:
     system_packages:
       - htop
