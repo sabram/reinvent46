@@ -52,7 +52,7 @@
                             "ParameterOverrides": "{\"VPCId\":\"vpc-8eff9fe6\", \"Ec2key\":\"hackathon\"}",
                             "RoleArn": "arn:aws:iam::260345904678:role/CloudFormationRole",
                             "StackName": "GameChangerReinventGatlingStack",
-                            "TemplatePath": "SourceArtifact::cf-dev-gamechanger-v2-gatling.yml"
+                            "TemplatePath": "SourceArtifact::templates/cloudformation/cf-dev-gamechanger-v2-gatling.yml"
                         },
                         "outputArtifacts": [],
                         "inputArtifacts": [

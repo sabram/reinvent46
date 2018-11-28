@@ -52,7 +52,7 @@
                             "Capabilities": "CAPABILITY_IAM",
                             "RoleArn": "arn:aws:iam::260345904678:role/CloudFormationRole",
                             "StackName": "GameChangerReinventEnhanceInfrastructureStack",
-                            "TemplatePath": "SourceArtifact::cf-dev-gamechanger-v2-env.yml"
+                            "TemplatePath": "SourceArtifact::templates/cloudformation/cf-dev-gamechanger-v2-env.yml"
                         },
                         "outputArtifacts": [],
                         "inputArtifacts": [
