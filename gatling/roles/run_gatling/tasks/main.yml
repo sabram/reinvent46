@@ -1,0 +1,11 @@
+---
+
+- name: Run Gatling
+  command: /home/ec2-user/run_gatling.sh
+  become: no
+  register: gatling_output
+
+- name: Debug output
+  debug:
+    msg: "{{ gatling_output }}"
+
