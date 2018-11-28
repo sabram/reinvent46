@@ -74,23 +74,43 @@ Metadata:
       z: 0
       embeds: []
 Resources: 
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Policies:
+        - PolicyName: allowLambdaLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Action:
+              - logs:*
+              Resource: arn:aws:logs:*:*:*
+        - PolicyName: allowSqs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Action:
+              - sqs:ReceiveMessage
+              - sqs:DeleteMessage
+              - sqs:GetQueueAttributes
+              - sqs:ChangeMessageVisibility
+              Resource: "*" #Should be set to mentioned queues only
   SQSPaymentRequests:
     Type: 'AWS::SQS::Queue'
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 1fc81219-dffd-4efe-a1c4-c288fb39a355
-  LFProcessPayment:
-    Type: 'AWS::Lambda::Function'
-    Properties:
-      Events:
-        SqsEvent:
-         Type: SQS
-         Properties:
-          Queue: !GetAtt SQSPaymentRequests.Arn
-          BatchSize: 10
-    Metadata:
-      'AWS::CloudFormation::Designer':
-        id: d6a5f6f5-d2e9-4053-bbb5-f2be5af8518f
   SQSPaymentResponseToTwitch:
     Type: 'AWS::SQS::Queue'
     Properties: {}
@@ -103,36 +123,83 @@ Resources:
     Metadata:
       'AWS::CloudFormation::Designer':
         id: b36779b3-acf1-4864-8afd-1d4fcda8c9c8
-  DDBT2JO95:
+  TransactionsDynamoDbTable:
     Type: 'AWS::DynamoDB::Table'
-    Properties: {}
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: partition
+          AttributeType: S
+        - AttributeName: sort
+          AttributeType: 'N'
+      KeySchema:
+        - AttributeName: partition
+          KeyType: HASH
+        - AttributeName: sort
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      TableName: gcc-te-dev-test
     Metadata:
       'AWS::CloudFormation::Designer':
         id: b47d95ba-a83b-4f7c-85d4-c2c7d8995c04
   LFPaymentResponseToTwitch:
     Type: 'AWS::Lambda::Function'
     Properties:
-      Events:
-       SqsEvent:
-        Type: SQS
-        Properties:
-          Queue: !GetAtt SQSPaymentResponseToTwitch.Arn
-          BatchSize: 100
+      Code:
+       ZipFile: lambda/my-nodejs-app.zip
+      Timeout: 30
+      Handler: PaymentResponseToTwitch.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: nodejs8.10
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 8a599f68-1745-46b0-887e-2d02c2174249
+  LFPaymentResponseToTwitchEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 10
+      Enabled: true
+      EventSourceArn: !GetAtt SQSPaymentResponseToTwitch.Arn
+      FunctionName: !GetAtt LFPaymentResponseToTwitch.Arn
   LFPaymentResponseToDynamoDB:
     Type: 'AWS::Lambda::Function'
     Properties:
-      Events:
-       SqsEvent:
-        Type: SQS
-        Properties:
-          Queue: !GetAtt SQSPaymentResponseToDynamoDB.Arn
-          BatchSize: 10
+      Code:
+       ZipFile: lambda/my-nodejs-app.zip
+      Timeout: 30
+      Handler: PaymentResponseToDynamoDB.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: nodejs8.10
     Metadata:
       'AWS::CloudFormation::Designer':
         id: 87c42fee-4fce-47d7-9dea-164ab96e65e9
+  LFPaymentResponseToDynamoDBEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 10
+      Enabled: true
+      EventSourceArn: !GetAtt SQSPaymentResponseToDynamoDB.Arn
+      FunctionName: !GetAtt LFPaymentResponseToDynamoDB.Arn
+  LFProcessPayment:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code:
+       ZipFile: lambda/my-nodejs-app.zip
+      Timeout: 30
+      Handler: ProcessPayment.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: nodejs8.10
+    Metadata:
+      'AWS::CloudFormation::Designer':
+        id: d6a5f6f5-d2e9-4053-bbb5-f2be5af8518f
+  LFProcessPaymentEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 10
+      Enabled: true
+      EventSourceArn: !GetAtt SQSPaymentRequests.Arn
+      FunctionName: !GetAtt LFProcessPayment.Arn
   SNSPaymentProcessed:
     Type: 'AWS::SNS::Topic'
     Properties:
