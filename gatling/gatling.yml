@@ -2,7 +2,7 @@
 #
 # Run locally with: ansible-playbook gatling.yml -i gatling_inventory --key-file "~/.ssh/hackathon.pem"
 #
-# Run via CodeBuild with: ansible-playbook gatling.yml
+# Run via CodeBuild with: ansible-playbook -i local gatling.yml
 
 - hosts: gatling
   remote_user: ubuntu
